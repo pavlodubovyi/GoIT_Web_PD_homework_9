@@ -16,10 +16,11 @@ def get_quotes(content):
         quote_info = {
             "tags": [tag.text for tag in quote.find_all('a', class_='tag')],
             "author": quote.find('small', class_='author').get_text(),
-            "quote": quote.find('span', class_='text').get_text()
+            "quote": quote.find('span', class_='text').get_text().replace("\u201c", "").replace("\u201d", "")
         }
         quotes_list.append(quote_info)
     return quotes_list
+
 
 
 def get_authors(content):
@@ -45,10 +46,16 @@ if __name__ == '__main__':
     BASE_URL = 'http://quotes.toscrape.com'
     page_content = get_page_content(BASE_URL)
 
-    the_authors = []
+    authors_dict = {}  # Словник для зберігання інформації про авторів
 
     while True:
-        the_authors.extend(get_authors(page_content))
+        # Отримання інформації про авторів
+        authors_list = get_authors(page_content)
+        for author in authors_list:
+            full_name = author['fullname']
+            # Якщо автора ще немає у словнику, додати його
+            if full_name not in authors_dict:
+                authors_dict[full_name] = author
 
         next_page_link = page_content.find('li', class_='next')
         if next_page_link is None:
@@ -57,7 +64,9 @@ if __name__ == '__main__':
         next_page_url = BASE_URL + next_page_link.find('a')['href']
         page_content = get_page_content(next_page_url)
 
-    save_to_json(the_authors, 'authors.json')
+    # Перетворення словника у список перед збереженням у файл
+    authors_list = list(authors_dict.values())
+    save_to_json(authors_list, 'authors.json')
 
     # Отримання цитат і їх збереження у файл
     quotes = get_quotes(page_content)
