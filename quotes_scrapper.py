@@ -22,7 +22,6 @@ def get_quotes(content):
     return quotes_list
 
 
-
 def get_authors(content):
     authors = content.find_all('div', class_='quote')
     authors_list = []
