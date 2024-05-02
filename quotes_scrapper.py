@@ -16,7 +16,7 @@ def get_quotes(content):
         quote_info = {
             "tags": [tag.text for tag in quote.find_all('a', class_='tag')],
             "author": quote.find('small', class_='author').get_text(),
-            "quote": quote.find('span', class_='text').get_text().replace("\u201c", "").replace("\u201d", "")
+            "quote": quote.find('span', class_='text').get_text()
         }
         quotes_list.append(quote_info)
     return quotes_list
@@ -37,7 +37,7 @@ def get_authors(content):
 
 
 def save_to_json(data, filename):
-    with open(filename, 'w') as f:
+    with open(filename, 'w', encoding='utf-8') as f:
         json.dump(data, f, indent=2)
 
 
