@@ -33,6 +33,10 @@ def manage_quotes(url):
                 "author": author_name,
                 "quote": quote_text
             })
+
+            # Write updated quotes to quotes.json
+            with open("quotes.json", "w", encoding="utf-8") as q:
+                json.dump(quotes_data, q, indent=2)
             print(f"A quote of {author_name} added to quotes.json")
     return quotes_data
 
@@ -82,6 +86,10 @@ def manage_authors(url):
                     "description": author_description
                 }
                 authors.append(authors_info)
+
+                # Write updated authors to the file
+                with open("authors.json", 'w') as af:
+                    json.dump(authors, af, indent=2)
                 print(f"Info about {author_name} added to authors.json")
         else:
             print(f"Unable to get response: Status {response.status_code} - {url}")
@@ -109,13 +117,13 @@ if __name__ == "__main__":
         else:
             break
 
-    with open("quotes.json", "w", encoding="utf-8") as quotes_file:
-        json.dump(data_quotes, quotes_file, indent=2)
-    print("Quotes saved to quotes.json")
-
-    # Add data to authors.json lists:
-    with open("authors.json", "w", encoding="utf-8") as authors_file:
-        json.dump(authors_data, authors_file, indent=2)
+    # with open("quotes.json", "w", encoding="utf-8") as quotes_file:
+    #     json.dump(data_quotes, quotes_file, indent=2)
+    # print("Quotes saved to quotes.json")
+    #
+    # # Add data to authors.json lists:
+    # with open("authors.json", "w", encoding="utf-8") as authors_file:
+    #     json.dump(authors_data, authors_file, indent=2)
 
     end_time = datetime.datetime.now()
     duration = end_time - start_time
