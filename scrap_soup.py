@@ -117,14 +117,6 @@ if __name__ == "__main__":
         else:
             break
 
-    # with open("quotes.json", "w", encoding="utf-8") as quotes_file:
-    #     json.dump(data_quotes, quotes_file, indent=2)
-    # print("Quotes saved to quotes.json")
-    #
-    # # Add data to authors.json lists:
-    # with open("authors.json", "w", encoding="utf-8") as authors_file:
-    #     json.dump(authors_data, authors_file, indent=2)
-
     end_time = datetime.datetime.now()
     duration = end_time - start_time
     print(f"Scraping completed in {duration}. I'd better try Scrappy :)")
