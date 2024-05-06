@@ -1,49 +1,45 @@
 import requests
 from bs4 import BeautifulSoup
 import json
-from models import Quote, Author
+import datetime
 import os.path
 
 BASE_URL = "https://quotes.toscrape.com/"
 
 
-def manage_quotes():
-    page = requests.get(BASE_URL)
-    soup = BeautifulSoup(page.content, "lxml")
+def manage_quotes(url):
+    quotes_data = []
+    if os.path.exists("quotes.json"):
+        with open("quotes.json", "r", encoding="utf-8") as q:
+            quotes_data = json.load(q)
+
+    web_page = requests.get(url)
+    soup = BeautifulSoup(web_page.content, "lxml")
 
     # Extract quotes, authors and tags
     quotes = soup.find_all("span", class_="text")
     authors = soup.find_all("small", class_="author")
     tags = soup.find_all("div", class_="tags")
 
-    # Creating list to store quotesdata
-    data_quotes = []
-
-    # Add data to quotes.json lists:
-    if not os.path.exists("quotes.json"):
-        with open("quotes.json", "r", encoding="utf-8") as q:
-            json.load(q)
-
     for i in range(len(quotes)):
         quote_text = quotes[i].text
         author_name = authors[i].text
         tags_in_quotes = [t.text for t in tags[i].find_all("a", class_="tag")]
 
-        data_quotes.append({
-            "tags": tags_in_quotes,
-            "author": author_name,
-            "quote": quote_text
-        })
-
-    with open("quotes.json", "w", encoding="utf-8") as quotes_file:
-        json.dump(data_quotes, quotes_file, indent=2)
-    print("Quotes saved to quotes.json")
+        if {"quote": quote_text, "author": author_name} not in quotes_data:
+            quotes_data.append({
+                "tags": tags_in_quotes,
+                "author": author_name,
+                "quote": quote_text
+            })
+            print(f"A quote of {author_name} added to quotes.json")
+    return quotes_data
 
 
 # Dealing with authors
-def manage_authors():
-    page = requests.get(BASE_URL)
-    soup = BeautifulSoup(page.content, "lxml")
+def manage_authors(url):
+    web_page = requests.get(url)
+    soup = BeautifulSoup(web_page.content, "lxml")
 
     # Extract author links
     author_links = soup.find_all("a", href=lambda href: href and "/author/" in href)
@@ -85,14 +81,41 @@ def manage_authors():
                     "description": author_description
                 }
                 authors.append(authors_info)
+                print(f"Info about {author_name} added to authors.json")
         else:
             print(f"Unable to get response: Status {response.status_code} - {url}")
-
-    # Add data to authors.json lists:
-    with open("authors.json", "w", encoding="utf-8") as authors_file:
-        json.dump(authors, authors_file, indent=2)
+    return authors
 
 
 if __name__ == "__main__":
-    manage_quotes()
-    manage_authors()
+    start_time = datetime.datetime.now()
+    data_quotes = []
+    authors_data = []
+
+    page_url = BASE_URL
+    while True:
+        page = requests.get(page_url)
+        if page.status_code == 200:
+            print(f"Managing {page_url}")
+            data_quotes += manage_quotes(page_url)
+            authors_data += manage_authors(page_url)
+            next_button = BeautifulSoup(page.content, "html.parser").find("li", class_="next")
+            if next_button:
+                next_url = next_button.find("a")["href"]
+                page_url = BASE_URL + next_url
+            else:
+                break
+        else:
+            break
+
+    with open("quotes.json", "w", encoding="utf-8") as quotes_file:
+        json.dump(data_quotes, quotes_file, indent=2)
+    print("Quotes saved to quotes.json")
+
+    # Add data to authors.json lists:
+    with open("authors.json", "w", encoding="utf-8") as authors_file:
+        json.dump(authors_data, authors_file, indent=2)
+
+    end_time = datetime.datetime.now()
+    duration = end_time - start_time
+    print(f"Scraping completed in {duration}. I'd better try Scrappy :)")
