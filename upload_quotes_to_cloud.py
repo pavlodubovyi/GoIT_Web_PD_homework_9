@@ -21,6 +21,11 @@ if __name__ == "__main__":
     with open("quotes.json", encoding="utf-8") as fd:
         data = json.load(fd)
         for el in data:
-            author, *_ = Author.objects(fullname=el.get("author"))
-            quote = Quote(quote=el.get("quote"), tags=el.get("tags"), author=author)
-            quote.save()
+            author_name = el.get("author").replace("-", " ")
+            authors = Author.objects(fullname=el.get("author"))
+            if authors:
+                author = authors[0]
+                quote = Quote(quote=el.get("quote"), tags=el.get("tags"), author=author)
+                quote.save()
+            else:
+                print(f"No author found for quote {el.get('quote')}")

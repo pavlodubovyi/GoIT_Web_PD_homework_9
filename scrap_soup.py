@@ -26,6 +26,7 @@ def manage_quotes(url):
         author_name = authors[i].text
         tags_in_quotes = [t.text for t in tags[i].find_all("a", class_="tag")]
 
+        # Check if the quote is already in quotes.json
         if {"quote": quote_text, "author": author_name} not in quotes_data:
             quotes_data.append({
                 "tags": tags_in_quotes,
