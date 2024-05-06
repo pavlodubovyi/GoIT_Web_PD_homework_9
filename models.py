@@ -16,11 +16,3 @@ class Quote(Document):
     tags = ListField(StringField())
     quote = StringField()
     meta = {"collection": "quotes"}
-
-
-class Contact(Document):
-    fullname = StringField(max_length=100, required=True)
-    email = StringField(max_length=50, required=True)
-    emailed = BooleanField(default=False)
-    meta = {"collection": "contacts"}
-

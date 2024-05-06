@@ -69,5 +69,5 @@ if __name__ == '__main__':
 
     # Отримання цитат і їх збереження у файл
     quotes = get_quotes(page_content)
-    save_to_json(quotes, 'quotes.json')
+    save_to_json(quotes, 'quotes_old.json')
 
