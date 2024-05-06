@@ -41,7 +41,6 @@ def manage_quotes(url):
     return quotes_data
 
 
-# Dealing with authors
 def manage_authors(url):
     web_page = requests.get(url)
     soup = BeautifulSoup(web_page.content, "lxml")
